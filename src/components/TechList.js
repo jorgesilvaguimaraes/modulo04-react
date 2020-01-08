@@ -1,10 +1,30 @@
 import React, { Component } from "react";
 
+import TechItem from "./TechItem";
+
 class TechList extends Component {
   state = {
     newTech: "",
-    techs: ["Node.js", "ReactJS", "React Native", "HTML5"]
+    techs: []
   };
+
+  componentDidMount() {
+    const techs = localStorage.getItem("techs");
+
+    if (techs) {
+      this.setState({
+        techs: JSON.parse(techs)
+      });
+    }
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.techs !== this.state.techs) {
+      localStorage.setItem("techs", JSON.stringify(this.state.techs));
+    }
+  }
+
+  componentWillUnmount() {}
 
   handleInputChange = e => {
     this.setState({
@@ -21,13 +41,23 @@ class TechList extends Component {
     });
   };
 
+  handleDelete = tech => {
+    this.setState({
+      techs: this.state.techs.filter(item => item !== tech)
+    });
+  };
+
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
         <h1>{this.state.newTech}</h1>
         <ul>
           {this.state.techs.map(tech => (
-            <li key={tech}>{tech}</li>
+            <TechItem
+              key={tech}
+              tech={tech}
+              onDelete={() => this.handleDelete(tech)}
+            />
           ))}
         </ul>
         <input
